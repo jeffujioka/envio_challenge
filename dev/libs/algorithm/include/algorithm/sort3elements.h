@@ -25,6 +25,7 @@ public:
   /// Explicitly Default-Move-Assignable
   Sort3Elements& operator=(Sort3Elements&& msg) = default;
 
+  void Sort(std::vector<uint32_t>& vec);
 };
 
 } // namespace synchronization
