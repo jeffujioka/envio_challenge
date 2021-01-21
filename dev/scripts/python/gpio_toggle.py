@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-import threading, time, textwrap, sys, os
+import threading, time, textwrap, argparse
 from gpio import Gpio
-import argparse
 
 if __name__ == '__main__':
   
@@ -30,8 +29,27 @@ if __name__ == '__main__':
   gpio.set_direction(gpio_pin_x, 'out')
 
   try:
+    toggle_value = 0
+
     while (True):
-      time.sleep(toggle_interval)
+      output_value = 0
+      sleep_interval = 0.1
+
+      if (gpio.input(gpio_pin_y) == '1'):
+        toggle_value = (0, 1)[toggle_value == 0] # toggle output value
+        output_value = toggle_value
+        sleep_interval = 1
+      else:
+        toggle_value = 0 # gpio y is low... so reset it
+      
+      gpio.output(gpio_pin_x, output_value)
+
+      print(''.join((f"gpio Y [pin={gpio_pin_y}, value={gpio.input(gpio_pin_y)}]",
+                      " | ",
+                     f"gpio X [pin={gpio_pin_x}, value={gpio.input(gpio_pin_x)}]")))
+
+      time.sleep(sleep_interval)
+
   except KeyboardInterrupt:
     print("Shutdown requested...exiting")
   except Exception:
@@ -39,6 +57,6 @@ if __name__ == '__main__':
       sys.exit(0)
     except SystemExit:
       os._exit(0)
-
-  gpio.unexport(gpio_pin_y)
-  gpio.unexport(gpio_pin_x)
+  finally:
+    gpio.unexport(gpio_pin_y)
+    gpio.unexport(gpio_pin_x)
