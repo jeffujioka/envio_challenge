@@ -7,18 +7,32 @@ if __name__ == '__main__':
   
   _HELP_GPIO_PIN = 'Defines the gpio {gpioPin} pin'
 
-  parser = argparse.ArgumentParser()
+  parser = argparse.ArgumentParser(description='\n'.join((
+        "retrieve the state of ​gpio ​Y and control gpio X based on the state of gpio Y",
+        "  - if gpio Y is in HIGH then ​gpio ​X need to be toggled this way (LOW-HIGH-LOW-HIGH…) every 1 second",
+        "  - if ​gpio ​Y is LOW, ​gpio ​X should remain in LOW as well"
+      )),
+      formatter_class=argparse.RawTextHelpFormatter)
 
   parser.add_argument('-i', type=int, required=True,
                       help=_HELP_GPIO_PIN.format(gpioPin='Y'))
   parser.add_argument('-o', type=int, required=True,
                       help=_HELP_GPIO_PIN.format(gpioPin='X'))
+  parser.add_argument('-v', '--verbose', action='store_true',
+                      help=textwrap.dedent('\n'.join((
+                          'Prints gpio pin levels.',
+                          'WARNING! Reading the value of an output pin is HW dependent.',
+                          'It means that the value of gpio X might not be printed correctly'))
+                        )
+                      )
 
   arg = parser.parse_args()
   
   gpio_pin_y = arg.i
   gpio_pin_x = arg.o
-  toggle_interval = 1 # it could come from options as welll
+  is_verbose = arg.verbose
+
+  sleep_interval = 1 # it could come from options as welll
 
   gpio = Gpio()
   gpio._set_gpio_base_path_only_for_testing_purposes('./sys/class/gpio')
@@ -44,9 +58,10 @@ if __name__ == '__main__':
       
       gpio.output(gpio_pin_x, output_value)
 
-      print(''.join((f"gpio Y [pin={gpio_pin_y}, value={gpio.input(gpio_pin_y)}]",
-                      " | ",
-                     f"gpio X [pin={gpio_pin_x}, value={gpio.input(gpio_pin_x)}]")))
+      if (is_verbose):
+        print(''.join((f"gpio Y [pin={gpio_pin_y}, value={gpio.input(gpio_pin_y)}]",
+                        " | ",
+                      f"gpio X [pin={gpio_pin_x}, value={gpio.input(gpio_pin_x)}]")))
 
       time.sleep(sleep_interval)
 
