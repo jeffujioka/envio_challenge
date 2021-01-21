@@ -6,3 +6,6 @@ set(JMF_UNIT_TEST_PREFIX "utest-")
 add_subdirectory(apps)
 add_subdirectory(libs)
 add_subdirectory(tests)
+
+install(DIRECTORY scripts DESTINATION .
+        PATTERN __pycache__ EXCLUDE)
