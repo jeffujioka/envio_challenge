@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+# based on: https://wiki.bash-hackers.org/howto/getopts_tutorial
+
+# A POSIX variable
+OPTIND=1         # Reset in case getopts has been used previously in the shell.
+
+# Initialize our own variables:
+gpio_y=""
+gpio_x=""
+verbose=0
+
+integer_regex='^[0-9]+$'
+
+usage() {
+  echo "Show usage"
+}
+
+while getopts "h?vi:o:" opt;
+do
+  case "$opt" in
+  h|\?)
+    usage
+    exit 0
+    ;;
+  v)
+    verbose=1
+    ;;
+  i)
+    if ! [[ $OPTARG =~ $integer_regex ]]; then
+      echo "error: -i expects an integer value"; exit 1
+    fi
+    gpio_y=$OPTARG
+    ;;
+  o)
+    if ! [[ $OPTARG =~ $integer_regex ]]; then
+      echo "error: -o expects an integer value"; exit 1
+    fi
+    gpio_x=$OPTARG
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+  esac
+done
+
+# if ((OPTIND == 1)) || [ -z "$gpio_y" ] || [ -z "$gpio_x" ]; then
+if ((OPTIND == 1)); then
+  usage
+  exit 1
+fi
+
+shift $((OPTIND-1))
+
+if [ -z "$gpio_y" ] || [ -z "$gpio_x" ]; then
+  usage
+  exit 1
+fi
+
+[ "${1:-}" = "--" ] && shift
