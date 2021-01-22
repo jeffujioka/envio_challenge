@@ -10,11 +10,11 @@ gpio_y=""
 gpio_x=""
 verbose=0
 
-integer_regex='^[0-9]+$'
-
 usage() {
   echo "Show usage"
 }
+
+integer_regex='^[0-9]+$'
 
 while getopts "h?vi:o:" opt;
 do
@@ -59,3 +59,57 @@ if [ -z "$gpio_y" ] || [ -z "$gpio_x" ]; then
 fi
 
 [ "${1:-}" = "--" ] && shift
+
+GPIO_BASE_PATH="/tmp/sys/class/gpio"
+
+gpio_export() {
+  if [  -n "$verbose" ]; then
+    echo "$1 > $GPIO_BASE_PATH/exports"
+  fi
+  echo $1 > $GPIO_BASE_PATH/exports
+}
+
+gpio_set_direction() {
+  if [  -n "$verbose" ]; then
+    echo "$2 > $GPIO_BASE_PATH/gpio$1/direction"
+  fi
+  echo $2 > $GPIO_BASE_PATH/gpio$1/direction
+}
+
+gpio_set_value() {
+  if [  -n "$verbose" ]; then
+    echo "$2 > $GPIO_BASE_PATH/gpio$1/value"
+  fi
+  echo $2 > $GPIO_BASE_PATH/gpio$1/value
+}
+
+gpio_get_value() {
+  if [  -n "$verbose" ]; then
+    echo "cat $GPIO_BASE_PATH/gpio$1/value"
+  fi
+  ret_val=$(< $GPIO_BASE_PATH/gpio$1/value)
+}
+
+gpio_export $gpio_y
+gpio_export $gpio_x
+
+gpio_set_direction $gpio_y 'in'
+gpio_set_direction $gpio_x 'out'
+
+toggle_value=0
+while true; do
+  gpio_get_value $gpio_y # reading the value of gpio Y
+
+  if [[ $ret_val == 1 ]]; then
+    case $toggle_value in
+      1) toggle_value=0 ;;
+      *) toggle_value=1 ;;
+    esac
+    gpio_set_value $gpio_x $toggle_value
+    sleep 1
+  else
+    toggle_value=0
+    gpio_set_value $gpio_x 0
+    sleep 0.1
+  fi
+done
