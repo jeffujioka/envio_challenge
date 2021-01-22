@@ -64,9 +64,16 @@ GPIO_BASE_PATH="/tmp/sys/class/gpio"
 
 gpio_export() {
   if [  -n "$verbose" ]; then
-    echo "$1 > $GPIO_BASE_PATH/exports"
+    echo "$1 > $GPIO_BASE_PATH/export"
   fi
-  echo $1 > $GPIO_BASE_PATH/exports
+  echo $1 > $GPIO_BASE_PATH/export
+}
+
+gpio_unexport() {
+  if [  -n "$verbose" ]; then
+    echo "$1 > $GPIO_BASE_PATH/unexport"
+  fi
+  echo $1 > $GPIO_BASE_PATH/unexport
 }
 
 gpio_set_direction() {
@@ -95,6 +102,16 @@ gpio_export $gpio_x
 
 gpio_set_direction $gpio_y 'in'
 gpio_set_direction $gpio_x 'out'
+
+quit() {
+  echo "bye! unexporting gpio Y [$gpio_y] and gpio X [$gpio_x]"
+  gpio_unexport $gpio_y
+  gpio_unexport $gpio_x
+  exit 0
+}
+
+trap quit SIGINT
+trap quit SIGTERM
 
 toggle_value=0
 while true; do
