@@ -36,6 +36,7 @@ $ ./docker-run.sh ./prj_build.sh
 ```shell
 $ ./docker-run.sh ./prj_install.sh
 ```
+:exclamation: Generated files will be installed at `./output/`
 ### To build and install
 ```shell
 $ ./docker-run.sh ./prj_build_install.sh

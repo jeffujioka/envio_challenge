@@ -7,5 +7,5 @@ add_subdirectory(apps)
 add_subdirectory(libs)
 add_subdirectory(tests)
 
-install(DIRECTORY scripts DESTINATION .
+install(DIRECTORY resources DESTINATION .
         PATTERN __pycache__ EXCLUDE)
