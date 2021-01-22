@@ -60,7 +60,7 @@ fi
 
 [ "${1:-}" = "--" ] && shift
 
-GPIO_BASE_PATH="/tmp/sys/class/gpio"
+GPIO_BASE_PATH="/sys/class/gpio"
 
 gpio_export() {
   if [  -n "$verbose" ]; then
