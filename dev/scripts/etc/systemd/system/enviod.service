@@ -1,0 +1,12 @@
+[Unit]
+Description=Envio gpio toggle
+
+[Service]
+# perhaps use a specific user? enviod?
+User=root
+EnvironmentFile=/etc/enviod.conf
+ExecStart=/usr/bin/gpio_toggle -i $GPIOY -o $GPIOX
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
